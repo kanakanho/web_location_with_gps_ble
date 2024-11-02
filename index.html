@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPSとBLEデータの表示</title>
+  </head>
+  <body>
+    <h1>GPSとBLEデータの表示</h1>
+    <div>
+      <h2>GPSデータ</h2>
+      <p id="gps-data">取得中...</p>
+    </div>
+    <div>
+      <h2>BLEデータ</h2>
+      <p id="ble-data">取得中...</p>
+    </div>
+
+    <button onclick="onClick()">取得</button>
+
+    <script>
+      // GPSデータを取得して表示
+      function getGPSData() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              document.getElementById("gps-data").textContent = `緯度: ${latitude}, 経度: ${longitude}`;
+            },
+            (error) => {
+              document.getElementById("gps-data").textContent = `エラー: ${error.message}`;
+            }
+          );
+        } else {
+          document.getElementById("gps-data").textContent = "Geolocationはこのブラウザでサポートされていません。";
+        }
+      }
+
+      // BLEデータを取得して表示
+      async function getBLEData() {
+        try {
+          navigator.bluetooth
+            .requestDevice({
+              acceptAllDevices: true,
+              optionalServices: ["battery_service"],
+            })
+            .then((device) => {
+              console.log(device);
+            });
+
+          // const device = await navigator.bluetooth.requestDevice({
+          //   acceptAllDevices: true,
+          //   optionalServices: [],
+          // });
+
+          // デバイス名を表示
+          // document.getElementById("ble-data").textContent = `デバイス名: ${device.uuid}`;
+
+          //   const server = await device.gatt.connect();
+          //   const service = await server.getPrimaryService("battery_service");
+          //   const characteristic = await service.getCharacteristic("battery_level");
+          //   const value = await characteristic.readValue();
+          //   const batteryLevel = value.getUint8(0);
+          //   document.getElementById("ble-data").textContent += `, バッテリーレベル: ${batteryLevel}%`;
+        } catch (error) {
+          // document.getElementById("ble-data").textContent = `エラー: ${error.message}`;
+          console.log(error);
+        }
+      }
+
+      // ボタンをクリックしたときにGPSデータとBLEデータを取得して表示
+      // パーミッションのリクエストを行うため、ボタンクリック時に関数を実行する
+      function onClick() {
+        getGPSData();
+        getBLEData();
+      }
+    </script>
+  </body>
+</html>
